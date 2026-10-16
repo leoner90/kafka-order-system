@@ -23,4 +23,9 @@ spring:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: order-service
-      auto-offset-reset: earliest
+      auto-offset-reset: earliest # // starts reading from the oldest available msg
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+    properties:
+      spring.json.add.type.headers: false # Prevent Java class metadata in Kafka headers; consumers use their own event classes.
