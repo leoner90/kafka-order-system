@@ -6,6 +6,23 @@ A simple event-driven microservices application for order processing, inventory 
 
 
 
+
+
+
+
+\## Project Start Up
+
+* Rename .env.example to just .env and replace user name and password in both microservices "Order" \&\& "Inventory"
+* Start Kafka server on 9092 port
+* Start All 3 microservices
+* Postman Post , JSON{}
+
+
+
+
+
+
+
 \## Technologies
 
 
@@ -16,15 +33,21 @@ A simple event-driven microservices application for order processing, inventory 
 
 \- \*\*Spring Data JPA / Hibernate\*\*
 
-\- \*\*Apache Kafka\*\* — asynchronous communication between microservices
+\- \*\*Apache Kafka 4.3.1\*\* — asynchronous communication between microservices
 
-\- \*\*PostgreSQL\*\* — database
+\- \*\*MySQL 8+\*\* — database
 
 \- \*\*JavaMailSender\*\* — email notifications
 
 \- \*\*Gradle\*\* — build automation
 
 \- \*\*JUnit 5 / Mockito\*\* — testing
+
+
+
+
+
+
 
 
 
@@ -37,4 +60,16 @@ A simple event-driven microservices application for order processing, inventory 
 \- \*\*Inventory Service\*\* — manages product stock and availability.
 
 \- \*\*Notification Service\*\* — sends email notifications based on Kafka events.
+
+
+
+
+
+
+
+\## Environment/.env Variables
+
+username: ${DB\_USERNAME}
+
+password: ${DB\_PASSWORD}
 

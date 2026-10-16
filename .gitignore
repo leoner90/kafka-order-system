@@ -30,5 +30,5 @@ application-local.yml
 application-local.yaml
 application-local.properties
 
-# Docker overrides (optional)
-docker-compose.override.yml
+# Kafka
+/kafka/
