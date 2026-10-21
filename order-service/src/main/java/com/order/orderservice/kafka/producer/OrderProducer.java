@@ -13,13 +13,13 @@ public class OrderProducer {
 
     private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
 
-    public void send(OrderCreatedEvent event) {
-        kafkaTemplate.send("order-created", event.orderId().toString(), event)
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        log.error("Failed to publish order: orderId={}", event.orderId(), ex);
+    public void send(OrderCreatedEvent orderCreatedEvent) {
+        kafkaTemplate.send("order-created", orderCreatedEvent.orderId().toString(), orderCreatedEvent)
+                .whenComplete((result, exception) -> {
+                    if (exception != null) {
+                        log.error("Failed to publish order: orderId={}", orderCreatedEvent.orderId(), exception);
                     } else {
-                        log.info("Order published to Kafka: orderId={}, topic={}", event.orderId(), result.getRecordMetadata().topic());
+                        log.info("Order published to Kafka: orderId={}, topic={}", orderCreatedEvent.orderId(), result.getRecordMetadata().topic());
                     }
                 });
     }

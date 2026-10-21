@@ -19,8 +19,9 @@ public class OrderServiceImpl  implements OrderService {
 
     @Override
     public void createOrder(OrderRequestDto request) {
-        OrderCreatedEvent event = orderMapper.toEvent(request); //kafka "dto"
-        log.info("Creating order: orderId={}, customerId={}", event.orderId(), event.customerId());
-        orderProducer.send(event);
+        // order is trimmed in mapper, mb it's good idea of using a mutable DTO or creating a copy.
+        OrderCreatedEvent orderCreatedEvent = orderMapper.toOrderCreatedEvent(request); //kafka "dto"
+        log.info("Creating order: orderId={}, customerId={}", orderCreatedEvent.orderId(), orderCreatedEvent.customerId());
+        orderProducer.send(orderCreatedEvent);
     }
 }

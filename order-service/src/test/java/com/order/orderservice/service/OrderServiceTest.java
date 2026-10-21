@@ -32,15 +32,13 @@ class OrderServiceTest {
 
     @Test
     void createOrder_shouldMapRequestAndSendEvent() {
-        OrderRequestDto request = new OrderRequestDto(15L, "Laptop", 2);
+        OrderRequestDto orderRequest  = new OrderRequestDto(1L, "ProductName", 2);
+        OrderCreatedEvent orderCreatedEvent  = new OrderCreatedEvent(UUID.randomUUID(), orderRequest.customerId(), orderRequest.productName(), orderRequest .quantity(), Instant.now());
 
-        OrderCreatedEvent event = new OrderCreatedEvent(UUID.randomUUID(), 15L, "Laptop", 2, Instant.now());
+        when(orderMapper.toOrderCreatedEvent(orderRequest )).thenReturn(orderCreatedEvent);
+        orderService.createOrder(orderRequest );
 
-        when(orderMapper.toEvent(request)).thenReturn(event);
-
-        orderService.createOrder(request);
-
-        verify(orderMapper).toEvent(request);
-        verify(orderProducer).send(event);
+        verify(orderMapper).toOrderCreatedEvent(orderRequest );
+        verify(orderProducer).send(orderCreatedEvent );
     }
 }

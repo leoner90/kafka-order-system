@@ -7,7 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
-
+import java.util.concurrent.CompletableFuture;
+import org.springframework.kafka.support.SendResult;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,6 +16,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 class OrderProducerTest {
@@ -28,11 +31,16 @@ class OrderProducerTest {
     @Test
     void shouldSendOrderCreatedEventToKafka() {
         UUID orderId = UUID.randomUUID();
-        OrderCreatedEvent event = new OrderCreatedEvent(orderId, 1L, "Laptop", 2, Instant.now());
+        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(orderId, 1L, "ProductName", 2, Instant.now());
+        CompletableFuture<SendResult<String, OrderCreatedEvent>> completableFuture = new CompletableFuture<>();
 
-        orderProducer.send(event);
+        when(kafkaTemplate.send("order-created", orderId.toString(), orderCreatedEvent)).thenReturn(completableFuture);
+        orderProducer.send(orderCreatedEvent);
 
-        verify(kafkaTemplate).send(eq("order-created"), eq(orderId.toString()), same(event));
-        verifyNoMoreInteractions(kafkaTemplate);
+        //additionally simulate Kafka publishing failure ( maybe need separate test)
+        completableFuture.completeExceptionally(new RuntimeException("Kafka unavailable"));
+
+        verify(kafkaTemplate).send(eq("order-created"), eq(orderId.toString()), same(orderCreatedEvent)); // was sent called?
+        verifyNoMoreInteractions(kafkaTemplate); // no other calls were done
     }
 }

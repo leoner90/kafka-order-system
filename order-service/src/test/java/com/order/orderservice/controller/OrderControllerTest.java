@@ -1,6 +1,5 @@
 package com.order.orderservice.controller;
 
-
 import tools.jackson.databind.ObjectMapper;
 import com.order.orderservice.dto.OrderRequestDto;
 import com.order.orderservice.service.OrderService;
@@ -13,8 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.hasItem;
 
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
@@ -28,10 +30,11 @@ class OrderControllerTest {
     @MockitoBean
     private OrderService orderService;
 
+    //order Creation success
     @Test
     void shouldCreateOrderSuccessfully() throws Exception {
 
-        OrderRequestDto request = new OrderRequestDto(15L, "Laptop", 2);
+        OrderRequestDto request = new OrderRequestDto(1L, "ProductName", 2);
 
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -40,5 +43,31 @@ class OrderControllerTest {
 
         verify(orderService, times(1)).createOrder(request);
     }
-}
 
+    //if DTO validation errors
+    @Test
+    void shouldReturnBadRequestForInvalidOrder() throws Exception {
+        OrderRequestDto request = new OrderRequestDto(null, "", 0);
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(orderService);
+    }
+
+    //if negative customer id passed (a bit redundant test)
+    @Test
+    void shouldReturnBadRequestForNegativeCustomerId() throws Exception {
+        OrderRequestDto request = new OrderRequestDto(-5L, "Laptop", 2);
+
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$", hasItem("customerId: Customer ID must be positive")));
+
+        verifyNoInteractions(orderService);
+    }
+}

@@ -19,13 +19,13 @@ class InventoryConsumerTest {
 
     @Test
     void shouldLogReceivedOrder(CapturedOutput output) {
-        UUID orderId = UUID.randomUUID();
-        OrderCreatedEvent event = new OrderCreatedEvent(orderId, 15L, "Laptop", 2, Instant.now());
 
-        consumer.consume(event);
+        OrderCreatedEvent orderCreatedEvent = new OrderCreatedEvent(UUID.randomUUID(), 1L, "ProductName", 2, Instant.now());
+        consumer.consume(orderCreatedEvent);
 
-        assertTrue(output.getAll().contains(orderId.toString()));
-        assertTrue(output.getAll().contains("Laptop"));
-        assertTrue(output.getAll().contains("2"));
+        //basically checking that logs contains msg from Kafka
+        assertTrue(output.getAll().contains(orderCreatedEvent.orderId().toString()));
+        assertTrue(output.getAll().contains(orderCreatedEvent.productName()));
+        assertTrue(output.getAll().contains("Quantity: " + orderCreatedEvent.quantity()));
     }
 }

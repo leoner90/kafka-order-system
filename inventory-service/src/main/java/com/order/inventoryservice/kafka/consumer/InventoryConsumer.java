@@ -12,7 +12,7 @@ public class InventoryConsumer {
     private static final Logger log = LoggerFactory.getLogger(InventoryConsumer.class);
 
     @KafkaListener(topics = "order-created")
-    public void consume(OrderCreatedEvent event) {
-        log.info(" Processing order: OrderId: {} Product: {}   Quantity: {}", event.orderId(),  event.product(), event.quantity());
+    public void consume(OrderCreatedEvent orderCreatedEvent) {
+        log.info(" Processing order: OrderId: {} Product: {}   Quantity: {}", orderCreatedEvent.orderId(),  orderCreatedEvent.productName(), orderCreatedEvent.quantity());
     }
 }
